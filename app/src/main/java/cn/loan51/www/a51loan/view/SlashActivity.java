@@ -61,10 +61,5 @@ public class SlashActivity extends Activity{
         mac_uuid = new DeviceUuidFactory(this).getDeviceUuid();
         L.e(TAG, "mac_uuid = "+mac_uuid);
 
-        // 待删除
-//        String device_id = this.getSharedPreferences("device_id.xml", 0).getString("device_id", null);
-//        String device_id = SharePreferenceUtils.getInstance().getMac_uuid();
-//        L.e(TAG, "device_id_from_prefs = "+device_id);
-//        Toast.makeText(this, ""+mac_uuid.toString().equals(device_id), Toast.LENGTH_SHORT).show();
     }
 }
