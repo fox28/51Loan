@@ -8,12 +8,25 @@ import android.widget.Toast;
 
 import com.example.apple.a51loan.R;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.UUID;
 
+import cn.loan51.www.a51loan.application.I;
 import cn.loan51.www.a51loan.application.SharePreferenceUtils;
+import cn.loan51.www.a51loan.bean.User;
 import cn.loan51.www.a51loan.utils.DeviceUuidFactory;
 import cn.loan51.www.a51loan.utils.L;
 import cn.loan51.www.a51loan.utils.MFGT;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * 获得设备识别码
@@ -27,6 +40,7 @@ public class SlashActivity extends Activity{
 
     private static UUID mac_uuid;
     private static final int slash_last_time = 3000;
+    private User mUser;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,11 +60,75 @@ public class SlashActivity extends Activity{
 
             }
         }, slash_last_time);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (mac_uuid == null) {
+                    getDeviceId();
+                }
+                if (mac_uuid!= null) {
+                    // 临时登录
+                    // 计算时间，闪屏保持3秒
+                    // https://modelx.yuzhidushu.com/api/v1/user/temp/login
+                    // okhttp下载，最终封装框架
+                    RequestBody requestBody = new FormBody.Builder()
+                            .add(I.User.MAC_UUID, mac_uuid+"")
+                            .build();
+                    Request request = new Request.Builder()
+                            .url(I.REQUEST_USER_TEMPORARY_LOGIN)
+                            .post(requestBody)
+                            .build();
+                    Call call = new OkHttpClient().newCall(request);
+                    call.enqueue(new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+
+                            String json = response.body().string();
+                            L.e(TAG, "onStart(), 临时登录，onResponse(), json = "+json);
+                            // 解析json数据， 最终封装框架
+                            try {
+                                JSONObject jsonObject = new JSONObject(json);
+                                L.e(TAG, "onStart(), 临时登录，onResponse(), jsonObject = "+jsonObject);
+                                L.e(TAG, "flag = "+jsonObject.getString("errmsg").equals("success"));
+                                if (jsonObject.getString("errmsg").equals("success")) {
+
+                                    JSONObject userJson = jsonObject.getJSONObject("data").getJSONObject("user");
+                                    L.e(TAG, "userJson = "+userJson);
+                                    mUser.setId(userJson.getInt("id"));
+                                    mUser.setMac_uuid(userJson.getString("mac_uuid"));
+                                    mUser.setName(userJson.getString("name"));
+                                    mUser.setUpdated_at(userJson.getString("updated_at"));
+                                    mUser.setCreated_at(userJson.getString("created_at"));
+                                    mUser.setAccess_token(userJson.getString("access_token"));
+                                    mUser.setTelephone(userJson.getString("telephone"));
+                                    L.e(TAG, "id, mac_uuid, name, updated_at, created_at, access_token :"+mUser.toString());
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    });
+
+
+
+                }
+
+            }
+        }).start();
+
     }
 
     private void initData() {
         // 获得设备识别码
         getDeviceId();
+        mUser = new User();
     }
 
     /**
