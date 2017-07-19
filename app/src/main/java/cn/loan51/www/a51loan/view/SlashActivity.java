@@ -4,22 +4,19 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.widget.Toast;
 
 import com.example.apple.a51loan.R;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.UUID;
 
 import cn.loan51.www.a51loan.application.I;
-import cn.loan51.www.a51loan.application.SharePreferenceUtils;
 import cn.loan51.www.a51loan.bean.User;
 import cn.loan51.www.a51loan.utils.DeviceUuidFactory;
 import cn.loan51.www.a51loan.utils.L;
 import cn.loan51.www.a51loan.utils.MFGT;
+import cn.loan51.www.a51loan.utils.Result;
+import cn.loan51.www.a51loan.utils.ResultUtils;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -75,7 +72,7 @@ public class SlashActivity extends Activity{
                     RequestBody requestBody = new FormBody.Builder()
                             .add(I.User.MAC_UUID, mac_uuid+"")
                             .build();
-                    Request request = new Request.Builder()
+                    final Request request = new Request.Builder()
                             .url(I.REQUEST_USER_TEMPORARY_LOGIN)
                             .post(requestBody)
                             .build();
@@ -91,27 +88,30 @@ public class SlashActivity extends Activity{
 
                             String json = response.body().string();
                             L.e(TAG, "onStart(), 临时登录，onResponse(), json = "+json);
-                            // 解析json数据， 最终封装框架
-                            try {
-                                JSONObject jsonObject = new JSONObject(json);
-                                L.e(TAG, "onStart(), 临时登录，onResponse(), jsonObject = "+jsonObject);
-                                L.e(TAG, "flag = "+jsonObject.getString("errmsg").equals("success"));
-                                if (jsonObject.getString("errmsg").equals("success")) {
+                            Result result = ResultUtils.getResultFromJsonWithUser(json, User.class);
+                            L.e(TAG, "result = "+ result);
 
-                                    JSONObject userJson = jsonObject.getJSONObject("data").getJSONObject("user");
-                                    L.e(TAG, "userJson = "+userJson);
-                                    mUser.setId(userJson.getInt("id"));
-                                    mUser.setMac_uuid(userJson.getString("mac_uuid"));
-                                    mUser.setName(userJson.getString("name"));
-                                    mUser.setUpdated_at(userJson.getString("updated_at"));
-                                    mUser.setCreated_at(userJson.getString("created_at"));
-                                    mUser.setAccess_token(userJson.getString("access_token"));
-                                    mUser.setTelephone(userJson.getString("telephone"));
-                                    L.e(TAG, "id, mac_uuid, name, updated_at, created_at, access_token :"+mUser.toString());
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                            // 解析json数据， 最终封装框架
+//                            try {
+//                                JSONObject jsonObject = new JSONObject(json);
+//                                L.e(TAG, "onStart(), 临时登录，onResponse(), jsonObject = "+jsonObject);
+//                                L.e(TAG, "flag = "+jsonObject.getString("errmsg").equals("success"));
+//                                if (jsonObject.getString("errmsg").equals("success")) {
+//
+//                                    JSONObject userJson = jsonObject.getJSONObject("data").getJSONObject("user");
+//                                    L.e(TAG, "userJson = "+userJson);
+//                                    mUser.setId(userJson.getInt("id"));
+//                                    mUser.setMac_uuid(userJson.getString("mac_uuid"));
+//                                    mUser.setName(userJson.getString("name"));
+//                                    mUser.setUpdated_at(userJson.getString("updated_at"));
+//                                    mUser.setCreated_at(userJson.getString("created_at"));
+//                                    mUser.setAccess_token(userJson.getString("access_token"));
+//                                    mUser.setTelephone(userJson.getString("telephone"));
+//                                    L.e(TAG, "id, mac_uuid, name, updated_at, created_at, access_token :"+mUser.toString());
+//                                }
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
 
                         }
                     });

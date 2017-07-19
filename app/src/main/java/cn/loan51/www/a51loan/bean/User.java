@@ -7,16 +7,26 @@ package cn.loan51.www.a51loan.bean;
 public class User {
 
     /*
-    "user": {
-            "id": 14,
-            "name": "590eee7833581",
-            "telephone": null,
-            "email": null,
-            "created_at": "2017-05-07 09:52:50",
-            "updated_at": "2017-05-07 09:52:56",
-            "mac_uuid": "829382988943",
-            "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjY4ZWFmMjI3YzY0YzY1OWU5MTllY2UxYTZkZWU1NjI0MDQwZjkwODFlNTg2MDFjNjIzOGY5MzIyMzA2NTUzN2Y5ZGY1NDhjYWE0NDM1YzkzIn0.eyJhdWQiOiIxIiwianRpIjoiNjhlYWYyMjdjNjRjNjU5ZTkxOWVjZTFhNmRlZTU2MjQwNDBmOTA4MWU1ODYwMWM2MjM4ZjkzMjIzMDY1NTM3ZjlkZjU0OGNhYTQ0MzVjOTMiLCJpYXQiOjE0OTQxNTA3NzYsIm5iZiI6MTQ5NDE1MDc3NiwiZXhwIjoxNTI1Njg2Nzc2LCJzdWIiOiIxNCIsInNjb3BlcyI6W119.hIwqbS2rvI1ZJTR_nfFu5l7Dky0EO1WzOZQCi-xkXyJK4WAN8rZ5g9HGq-S-w6nWKCn1yAKwMTrUAHJIxoIa20bmR7wwk55_BL7R-2buldypubVCN_z6PJTa6MvOMj-8ZOEJIniPBWPS1GvFALAmxXo4M_9WqcGvTbNhrRT7X12VsvRmxEgPJxsN4rgBk24RtnserFBM8V-tpaYnQmFJvqWvB-VRS8ILuTPwk5NWZOsTs3awhZ_mhio08F0brqiZK_Ik5jqpaDhnxR_qkdnJo6pbyhboZWKUDRHPkXw8_OOwwxFBfoVMVS1ZxqCJ8AyXwBf_h2aRZjpYIp0wLb0MFjLjCfLtiT0k0-LoIC-F3EtGDmtkRjghrA1zT2b1MO_ORzsaZFyg8eFPJDdZyuZbVNLeh5ic-e34vLCbHJT-twnfb-CYqw3a28ygCURBELzeqoEBgo3l20gSmTvBWKM13xeB7ihRBboOLA5hju7iuk7mmiPHxQyssxFC7-P-kAt6vGpnxQiF4dnFyd-qh_x3WfdVBcvYXBA0BRwcT6sOKBAx_Xe7K-7mebvxSKxIV5sQvfem-XVtamoq-pC6yt11FhQEvs6MGOOBT0DXcxrHNLK8HdCDgYI6Z7R0zlP2zah88wG-Rg0lgDc4V7t41DffuU8xjbLF2tVFoQ_LgJn-JEo"
-        }
+     "id": 163,
+      "name": "596ecd006d4ee",
+      "telephone": null,
+      "email": null,
+      "created_at": "2017-07-19 03:07:44",
+      "updated_at": "2017-07-19 03:07:44",
+      "mac_uuid": "a11c3d84-57d5-302d-a0ed-82a47878c92a",
+      "unionid": null,
+      "nickname": null,
+      "sex": null,
+      "language": null,
+      "city": null,
+      "province": null,
+      "country": null,
+      "avatar": null,
+      "remark": null,
+      "subscribed": null,
+      "openid": null,
+      "role_id": "0",
+      "access_token": "eyJ0eX
      */
     private int id;
     private String name;
@@ -25,6 +35,17 @@ public class User {
     private String created_at;
     private String updated_at;
     private String mac_uuid;
+//    private String unionid;
+//    private String nickname;
+//    private String sex;
+////    private String language;
+//    private String province;
+//    private String country;
+//    private String avatar;
+//    private String remark;
+//    private String subscribed;
+//    private String openid;
+//    private String role_id;
     private String access_token;
 
     public User(String telephone) {
@@ -80,8 +101,6 @@ public class User {
         this.access_token = access_token;
     }
 
-
-
     public String getMac_uuid() {
         return mac_uuid;
     }
@@ -97,6 +116,7 @@ public class User {
     public void setTelephone(String telephone) {
         this.telephone = telephone;
     }
+
 
     @Override
     public boolean equals(Object obj) {
