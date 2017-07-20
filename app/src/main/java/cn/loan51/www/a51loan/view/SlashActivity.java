@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import cn.loan51.www.a51loan.application.I;
+import cn.loan51.www.a51loan.application.SharePreferenceUtils;
 import cn.loan51.www.a51loan.bean.User;
 import cn.loan51.www.a51loan.utils.DeviceUuidFactory;
 import cn.loan51.www.a51loan.utils.L;
@@ -28,7 +29,9 @@ import okhttp3.Response;
 /**
  * 获得设备识别码
  * 闪屏持续时间2秒钟
- * 右上角可跳过（功能实现）
+ * 右上角可跳过（功能实现）-- 【待实现】
+ * 临时登录、登录不成功、显示"登录异常，稍后重试"---断网测试
+ *          登录成功，跳转主页
  * Created by apple on 2017/7/18.
  */
 
@@ -36,7 +39,7 @@ public class SlashActivity extends Activity{
     private static final String TAG = "SlashActivity";
 
     private static UUID mac_uuid;
-    private static final int slash_last_time = 3000;
+    private static final int SLASH_LAST_TIME = 5000;
     private User mUser;
 
     @Override
@@ -49,18 +52,19 @@ public class SlashActivity extends Activity{
     @Override
     protected void onStart() {
         super.onStart();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                MFGT.gotoMainActivity(SlashActivity.this);
-                MFGT.finish(SlashActivity.this);
-
-            }
-        }, slash_last_time);
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                MFGT.gotoMainActivity(SlashActivity.this);
+//                MFGT.finish(SlashActivity.this);
+//
+//            }
+//        }, SLASH_LAST_TIME);
 
         new Thread(new Runnable() {
             @Override
             public void run() {
+                final Long start = System.currentTimeMillis();//起始时间点
                 if (mac_uuid == null) {
                     getDeviceId();
                 }
@@ -87,31 +91,39 @@ public class SlashActivity extends Activity{
                         public void onResponse(Call call, Response response) throws IOException {
 
                             String json = response.body().string();
+                            boolean flag = false;
                             L.e(TAG, "onStart(), 临时登录，onResponse(), json = "+json);
                             Result result = ResultUtils.getResultFromJsonWithUser(json, User.class);
                             L.e(TAG, "result = "+ result);
+                            if (result!=null&&result.getRetMsg().equals("success")) {
+                                if (result.getRetData()!=null) {
+                                    mUser = (User) result.getRetData();
+                                    L.e(TAG, "临时登录, onResponse(), mUser = "+mUser);
+                                    saveUserInfo(mUser);
+                                    // 验证：打印输出SharePreference
+                                    L.e(TAG, SharePreferenceUtils.getInstance().getName());
+                                    if (mUser != null) {
+                                        flag =true;
+                                    }
 
-                            // 解析json数据， 最终封装框架
-//                            try {
-//                                JSONObject jsonObject = new JSONObject(json);
-//                                L.e(TAG, "onStart(), 临时登录，onResponse(), jsonObject = "+jsonObject);
-//                                L.e(TAG, "flag = "+jsonObject.getString("errmsg").equals("success"));
-//                                if (jsonObject.getString("errmsg").equals("success")) {
-//
-//                                    JSONObject userJson = jsonObject.getJSONObject("data").getJSONObject("user");
-//                                    L.e(TAG, "userJson = "+userJson);
-//                                    mUser.setId(userJson.getInt("id"));
-//                                    mUser.setMac_uuid(userJson.getString("mac_uuid"));
-//                                    mUser.setName(userJson.getString("name"));
-//                                    mUser.setUpdated_at(userJson.getString("updated_at"));
-//                                    mUser.setCreated_at(userJson.getString("created_at"));
-//                                    mUser.setAccess_token(userJson.getString("access_token"));
-//                                    mUser.setTelephone(userJson.getString("telephone"));
-//                                    L.e(TAG, "id, mac_uuid, name, updated_at, created_at, access_token :"+mUser.toString());
-//                                }
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
+                                }
+                            }
+
+                            // 设置持续时间
+                            Long lastTime = System.currentTimeMillis() - start;
+                            if (SLASH_LAST_TIME - lastTime > 0) {
+                                try {
+                                    Thread.sleep(SLASH_LAST_TIME-lastTime);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            if (flag) {
+                                MFGT.gotoMainActivity(SlashActivity.this);
+                                MFGT.finish(SlashActivity.this);
+                            } else {
+                                //  设置flag，跳转主页或者异常页面
+                            }
 
                         }
                     });
@@ -137,7 +149,14 @@ public class SlashActivity extends Activity{
      */
     private void getDeviceId() {
         mac_uuid = new DeviceUuidFactory(this).getDeviceUuid();
-        L.e(TAG, "mac_uuid = "+mac_uuid);
 
+    }
+
+    private void saveUserInfo(User user) {
+        if (user != null) {
+            SharePreferenceUtils.getInstance().setAccessToken(user.getAccess_token());
+            SharePreferenceUtils.getInstance().setName(user.getName());
+            SharePreferenceUtils.getInstance().setTelephone(user.getTelephone());
+        }
     }
 }
