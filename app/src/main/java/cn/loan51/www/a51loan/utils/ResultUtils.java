@@ -9,6 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
 import cn.loan51.www.a51loan.application.I;
+import cn.loan51.www.a51loan.bean.Result;
 
 /**
  * Created by apple on 2017/7/19.

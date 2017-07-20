@@ -2,7 +2,6 @@ package cn.loan51.www.a51loan.view;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 
 import com.example.apple.a51loan.R;
@@ -16,7 +15,7 @@ import cn.loan51.www.a51loan.bean.User;
 import cn.loan51.www.a51loan.utils.DeviceUuidFactory;
 import cn.loan51.www.a51loan.utils.L;
 import cn.loan51.www.a51loan.utils.MFGT;
-import cn.loan51.www.a51loan.utils.Result;
+import cn.loan51.www.a51loan.bean.Result;
 import cn.loan51.www.a51loan.utils.ResultUtils;
 import okhttp3.Call;
 import okhttp3.Callback;

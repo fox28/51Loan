@@ -1,4 +1,4 @@
-package cn.loan51.www.a51loan.utils;
+package cn.loan51.www.a51loan.bean;
 
 import java.io.Serializable;
 
