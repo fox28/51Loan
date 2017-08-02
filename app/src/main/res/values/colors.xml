@@ -3,4 +3,7 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <!-- 首页底部菜单栏背景颜色-->
+    <color name="bottom_bar_taobao_bg">#F9F7F4</color>
 </resources>

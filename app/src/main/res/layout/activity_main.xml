@@ -1,17 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="cn.loan51.www.a51loan.view.MainActivity">
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="MainActivity"
-        android:textSize="22sp"
-        android:gravity="center_horizontal"
-        />
 
-</LinearLayout>
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:background="@color/bottom_bar_taobao_bg"
+        >
+        <RadioButton
+            style="@style/menu_item_style"
+            android:text="首页"
+            android:drawableTop="@drawable/selector_menu_item_homepage"
+            android:textColor="@color/selector_menu_item_text_color"
+            android:checked="true"
+            />
+        <RadioButton
+            style="@style/menu_item_style"
+            android:text="速贷汇"
+            android:drawableTop="@drawable/selector_menu_item_gather"
+            android:textColor="@color/selector_menu_item_text_color"
+            />
+        <RadioButton
+            style="@style/menu_item_style"
+            android:text="我的"
+            android:drawableTop="@drawable/selector_menu_item_personal_center"
+            android:textColor="@color/selector_menu_item_text_color"
+            />
+    </RadioGroup>
+</RelativeLayout>
