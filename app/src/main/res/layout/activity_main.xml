@@ -15,6 +15,7 @@
         android:background="@color/bottom_bar_taobao_bg"
         >
         <RadioButton
+            android:id="@+id/layout_home"
             style="@style/menu_item_style"
             android:text="首页"
             android:drawableTop="@drawable/selector_menu_item_homepage"
@@ -22,12 +23,14 @@
             android:checked="true"
             />
         <RadioButton
+            android:id="@+id/layout_gathter"
             style="@style/menu_item_style"
             android:text="速贷汇"
             android:drawableTop="@drawable/selector_menu_item_gather"
             android:textColor="@color/selector_menu_item_text_color"
             />
         <RadioButton
+            android:id="@+id/layout_personal_center"
             style="@style/menu_item_style"
             android:text="我的"
             android:drawableTop="@drawable/selector_menu_item_personal_center"
