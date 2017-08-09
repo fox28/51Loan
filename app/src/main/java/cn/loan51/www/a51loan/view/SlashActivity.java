@@ -3,6 +3,7 @@ package cn.loan51.www.a51loan.view;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.apple.a51loan.R;
 
@@ -14,6 +15,7 @@ import cn.loan51.www.a51loan.bean.Result;
 import cn.loan51.www.a51loan.bean.User;
 import cn.loan51.www.a51loan.utils.DeviceUuidFactory;
 import cn.loan51.www.a51loan.utils.L;
+import cn.loan51.www.a51loan.utils.MFGT;
 import cn.loan51.www.a51loan.utils.OkUtils;
 
 /**
@@ -29,8 +31,7 @@ public class SlashActivity extends Activity{
     private static final String TAG = "SlashActivity";
 
     private static UUID mac_uuid;
-    private static final int SLASH_LAST_TIME = 5000;
-    private User mUser;
+    private static final int SLASH_LAST_TIME = 3000;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,53 +74,42 @@ public class SlashActivity extends Activity{
                                 @Override
                                 public void onSuccess(Result result) {
                                     L.e(TAG, result.toString());
+                                    boolean flag = false;
+                                    if (result!=null && result.getRetMsg().equals("success")) {
+                                        User user = (User) result.getRetData();
+                                        if (user!=null) {
+                                            // user保存到SharePreference
+                                            saveUserInfo(user);
+                                            flag =true;
+                                        }
+                                        // 验证：打印输出SharePreference
+                                        Log.e(TAG, SharePreferenceUtils.getInstance().getName());
+
+                                    }
+                                    Long lastTime = System.currentTimeMillis() - start;
+                                    if (SLASH_LAST_TIME - lastTime > 0) {
+                                        try {
+                                            Thread.sleep(SLASH_LAST_TIME-lastTime);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    if (flag) {
+                                        MFGT.gotoMainActivity(SlashActivity.this);
+                                        MFGT.finish(SlashActivity.this);
+                                    } else {
+                                        //  设置flag，跳转主页或者异常页面
+                                    }
                                 }
 
                                 @Override
                                 public void onError(String error) {
                                     L.e(TAG, "onError, error = "+error);
 
+
                                 }
                             });
-//                    RequestBody requestBody = new FormBody.Builder()
-//                            .add(I.User.MAC_UUID, mac_uuid+"")
-//                            .build();
-//                    final Request request = new Request.Builder()
-//                            .url(I.REQUEST_USER_TEMPORARY_LOGIN)
-//                            .post(requestBody)
-//                            .build();
-//                    Call call = new OkHttpClient().newCall(request);
-//                    call.enqueue(new Callback() {
-//                        @Override
-//                        public void onFailure(Call call, IOException e) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onResponse(Call call, Response response) throws IOException {
-//
-//                            String json = response.body().string();
-//                            boolean flag = false;
-//                            L.e(TAG, "onStart(), 临时登录，onResponse(), json = "+json);
-//                            Result result = ResultUtils.getResultFromJson(json, User.class);
-//                            L.e(TAG, "result = "+ result);
-//                            if (result!=null&&result.getRetMsg().equals("success")) {
-//                                if (result.getData()!=null) {
-//                                    mUser = (User) result.getData();
-//                                    L.e(TAG, "临时登录, onResponse(), mUser = "+mUser);
-//                                    saveUserInfo(mUser);
-//                                    // 验证：打印输出SharePreference
-//                                    L.e(TAG, SharePreferenceUtils.getInstance().getName());
-//                                    if (mUser != null) {
-//                                        flag =true;
-//                                    }
-//
-//                                }
-//                            }
-//
-//
-//                        }
-//                    });
+
 
 
                 }
@@ -127,20 +117,6 @@ public class SlashActivity extends Activity{
         }).start();
         /*
          // 设置持续时间
-                            Long lastTime = System.currentTimeMillis() - start;
-                            if (SLASH_LAST_TIME - lastTime > 0) {
-                                try {
-                                    Thread.sleep(SLASH_LAST_TIME-lastTime);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            if (flag) {
-                                MFGT.gotoMainActivity(SlashActivity.this);
-                                MFGT.finish(SlashActivity.this);
-                            } else {
-                                //  设置flag，跳转主页或者异常页面
-                            }
 
          */
 
@@ -149,7 +125,6 @@ public class SlashActivity extends Activity{
     private void initData() {
         // 获得设备识别码
         getDeviceId();
-        mUser = new User();
     }
 
     /**
@@ -168,5 +143,11 @@ public class SlashActivity extends Activity{
             SharePreferenceUtils.getInstance().setName(user.getName());
             SharePreferenceUtils.getInstance().setTelephone(user.getTelephone());
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        OkUtils.onRelease();
     }
 }
