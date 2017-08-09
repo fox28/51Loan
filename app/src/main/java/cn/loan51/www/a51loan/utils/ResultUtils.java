@@ -1,12 +1,14 @@
 package cn.loan51.www.a51loan.utils;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 import cn.loan51.www.a51loan.application.I;
 import cn.loan51.www.a51loan.bean.Result;
@@ -29,7 +31,7 @@ public class ResultUtils {
      * @param <T>
      * @return
      */
-    public static <T> Result getResultFromJsonWithUser(String jsonStr, Class<T> cls) {
+    public static <T> Result getResultFromJson(String jsonStr, Class<T> cls) {
         Result result = new Result();
         // jsonStr转换成jsonObject类型
         try {
@@ -45,7 +47,7 @@ public class ResultUtils {
             JSONObject dataObject = jsonObject.getJSONObject("data").getJSONObject("user");
             if (!jsonObject.isNull("data") && dataObject!=null) {// 返回数据不为空
                 String data;
-                L.e("ResultUtils", "getResultFromJsonWithUser, RetData = "+dataObject);
+                L.e("ResultUtils", "getResultFromJson, RetData = "+dataObject);
                 // dataObject转换成泛型类
                 try {
                     data = URLDecoder.decode(dataObject.toString(), I.UTF_8);
@@ -66,4 +68,23 @@ public class ResultUtils {
         }
         return null;
     }
+
+//    public static <T> Result getResultFromJson(String jsonStr, Class<T> claz) {
+//        Result result = new Result();
+//        try {
+//            String json = URLEncoder.encode(jsonStr, I.UTF_8);
+//            // 第一次Gson解析
+//            result = new Gson().fromJson(json, Result.class);
+//            if (result.getData() != null) {
+//                T t =  new Gson().fromJson((JsonElement) Result.getData(), claz);
+//                result.setData(t);
+//                return  result;
+//            }
+//            // 若result.getData == null, result
+//            return result;
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 }

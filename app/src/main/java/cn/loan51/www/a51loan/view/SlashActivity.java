@@ -6,24 +6,15 @@ import android.support.annotation.Nullable;
 
 import com.example.apple.a51loan.R;
 
-import java.io.IOException;
 import java.util.UUID;
 
 import cn.loan51.www.a51loan.application.I;
 import cn.loan51.www.a51loan.application.SharePreferenceUtils;
+import cn.loan51.www.a51loan.bean.Result;
 import cn.loan51.www.a51loan.bean.User;
 import cn.loan51.www.a51loan.utils.DeviceUuidFactory;
 import cn.loan51.www.a51loan.utils.L;
-import cn.loan51.www.a51loan.utils.MFGT;
-import cn.loan51.www.a51loan.bean.Result;
-import cn.loan51.www.a51loan.utils.ResultUtils;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import cn.loan51.www.a51loan.utils.OkUtils;
 
 /**
  * 获得设备识别码
@@ -68,47 +59,74 @@ public class SlashActivity extends Activity{
                     getDeviceId();
                 }
                 if (mac_uuid!= null) {
-                    // 临时登录
+                    // 临时登录过程：
                     // 计算时间，闪屏保持3秒
                     // https://modelx.yuzhidushu.com/api/v1/user/temp/login
-                    // okhttp下载，最终封装框架
-                    RequestBody requestBody = new FormBody.Builder()
-                            .add(I.User.MAC_UUID, mac_uuid+"")
-                            .build();
-                    final Request request = new Request.Builder()
-                            .url(I.REQUEST_USER_TEMPORARY_LOGIN)
-                            .post(requestBody)
-                            .build();
-                    Call call = new OkHttpClient().newCall(request);
-                    call.enqueue(new Callback() {
-                        @Override
-                        public void onFailure(Call call, IOException e) {
+                    // OkHttp下载，最终封装框架
+                    // post请求
+                    OkUtils<Result> utils = new OkUtils<>(SlashActivity.this);
+                    utils.url(I.REQUEST_USER_TEMPORARY_LOGIN)
+                            .post()
+                            .addParam(I.User.MAC_UUID, mac_uuid+"")
+                            .targetClass(User.class)
+                            .execute(new OkUtils.OnCompleteListener<Result>() {
+                                @Override
+                                public void onSuccess(Result result) {
+                                    L.e(TAG, result.toString());
+                                }
 
-                        }
-
-                        @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-
-                            String json = response.body().string();
-                            boolean flag = false;
-                            L.e(TAG, "onStart(), 临时登录，onResponse(), json = "+json);
-                            Result result = ResultUtils.getResultFromJsonWithUser(json, User.class);
-                            L.e(TAG, "result = "+ result);
-                            if (result!=null&&result.getRetMsg().equals("success")) {
-                                if (result.getRetData()!=null) {
-                                    mUser = (User) result.getRetData();
-                                    L.e(TAG, "临时登录, onResponse(), mUser = "+mUser);
-                                    saveUserInfo(mUser);
-                                    // 验证：打印输出SharePreference
-                                    L.e(TAG, SharePreferenceUtils.getInstance().getName());
-                                    if (mUser != null) {
-                                        flag =true;
-                                    }
+                                @Override
+                                public void onError(String error) {
+                                    L.e(TAG, "onError, error = "+error);
 
                                 }
-                            }
+                            });
+//                    RequestBody requestBody = new FormBody.Builder()
+//                            .add(I.User.MAC_UUID, mac_uuid+"")
+//                            .build();
+//                    final Request request = new Request.Builder()
+//                            .url(I.REQUEST_USER_TEMPORARY_LOGIN)
+//                            .post(requestBody)
+//                            .build();
+//                    Call call = new OkHttpClient().newCall(request);
+//                    call.enqueue(new Callback() {
+//                        @Override
+//                        public void onFailure(Call call, IOException e) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onResponse(Call call, Response response) throws IOException {
+//
+//                            String json = response.body().string();
+//                            boolean flag = false;
+//                            L.e(TAG, "onStart(), 临时登录，onResponse(), json = "+json);
+//                            Result result = ResultUtils.getResultFromJson(json, User.class);
+//                            L.e(TAG, "result = "+ result);
+//                            if (result!=null&&result.getRetMsg().equals("success")) {
+//                                if (result.getData()!=null) {
+//                                    mUser = (User) result.getData();
+//                                    L.e(TAG, "临时登录, onResponse(), mUser = "+mUser);
+//                                    saveUserInfo(mUser);
+//                                    // 验证：打印输出SharePreference
+//                                    L.e(TAG, SharePreferenceUtils.getInstance().getName());
+//                                    if (mUser != null) {
+//                                        flag =true;
+//                                    }
+//
+//                                }
+//                            }
+//
+//
+//                        }
+//                    });
 
-                            // 设置持续时间
+
+                }
+            }
+        }).start();
+        /*
+         // 设置持续时间
                             Long lastTime = System.currentTimeMillis() - start;
                             if (SLASH_LAST_TIME - lastTime > 0) {
                                 try {
@@ -124,15 +142,7 @@ public class SlashActivity extends Activity{
                                 //  设置flag，跳转主页或者异常页面
                             }
 
-                        }
-                    });
-
-
-
-                }
-
-            }
-        }).start();
+         */
 
     }
 
@@ -148,6 +158,7 @@ public class SlashActivity extends Activity{
      */
     private void getDeviceId() {
         mac_uuid = new DeviceUuidFactory(this).getDeviceUuid();
+        L.e(TAG, "mac_uuid = "+mac_uuid);
 
     }
 
